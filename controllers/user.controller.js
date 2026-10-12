@@ -124,21 +124,33 @@ exports.deleteUser = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select("+password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const { firstName, lastName, email, password } = req.body;
+    const { currentPassword, newPassword, firstName, lastName, email } = req.body;
+
+    // If a new password is being set, require the current password
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ message: "Current password is required" });
+      }
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+      // Password strength check
+      const pwdErrors = validatePasswordStrength(newPassword);
+      if (pwdErrors.length > 0) {
+        return res.status(400).json({
+          message: `Password is not strong enough: ${pwdErrors.join(", ")}`,
+        });
+      }
+      user.password = newPassword;   // pre-save hook will hash it
+    }
+
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
     if (email) user.email = email;
-    if (password) {
-      const pwdErrors = validatePasswordStrength(password);
-      if (pwdErrors.length > 0) {
-        return res.status(400).json({ message: `Password is not strong enough: ${pwdErrors.join(", ")}` });
-      }
-      if (password.length < 6) return res.status(400).json({ message: "Password too short" });
-      user.password = password;
-    }
 
     await user.save();
     res.json({
