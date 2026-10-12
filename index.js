@@ -12,7 +12,16 @@ app.use(express.json());
 app.use(cors());
 
 const UserRouter = require("./routers/user.routes");
+const PropertyRouter = require("./routers/property.routes");
+const applicationRoutes = require("./routers/application.routes");
+const savedRoutes = require("./routers/saved.routes");
+const uploadRoutes = require("./routers/upload.routes");
+
 app.use("/api/v1", UserRouter);
+app.use("/api/v1/properties", PropertyRouter);
+app.use("/api/v1/applications", applicationRoutes);
+app.use("/api/v1/saved", savedRoutes);
+app.use("/api/v1/upload", uploadRoutes);
 
 mongoose.connect(process.env.DB_URI)
   .then(() => {
@@ -31,7 +40,4 @@ app.listen(PORT, (err) => {
   }
 });
 
-module.exports= connectDB=async(req, res)=>{
-    await connectDB()
-    
-}
+

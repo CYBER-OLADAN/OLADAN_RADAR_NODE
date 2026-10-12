@@ -1,5 +1,5 @@
 {
-  "name": "augrevnode",
+  "name": "projnode",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -19,6 +19,7 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.10.1",
+    "multer": "^1.4.5-lts.2",
     "nodemailer": "^10.0.12"
   }
 }
